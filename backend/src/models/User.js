@@ -30,8 +30,7 @@ const userSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      default:
-        process.env.DEFAULT_USER_IMAGE || "public/image/users/default-user.png",
+      default: process.env.DEFAULT_USER_IMAGE,
     },
     address: {
       type: String,

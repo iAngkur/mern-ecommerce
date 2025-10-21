@@ -1,6 +1,8 @@
 const createHttpError = require("http-errors");
 const User = require("../models/User");
 const { successResponse } = require("./responseController");
+const { findWithId } = require("../services/userService");
+const fs = require("fs");
 
 const userController = {
   getUsers: async (req, res, next) => {
@@ -63,6 +65,51 @@ const userController = {
                 : null,
           },
         },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getUserById: async (req, res, next) => {
+    const userId = req.params.id;
+    try {
+      const user = await findWithId(userId);
+
+      return successResponse(res, {
+        statusCode: 200,
+        message: "User fetched successfully",
+        payload: {
+          user,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  deleteUserById: async (req, res, next) => {
+    const userId = req.params.id;
+    try {
+      const user = await findWithId(userId);
+
+      const userImgPath = user.image;
+
+      if (!isDefaultImage(userImgPath)) {
+        fs.access(userImgPath, (err) => {
+          if (err) {
+            throw createHttpError(400, "Failed to read image");
+          } else {
+            fs.unlink(userImgPath, (err) => {
+              if (err) {
+                throw err;
+              }
+            });
+          }
+        });
+      }
+
+      return successResponse(res, {
+        statusCode: 200,
+        message: "User deleted successfully",
       });
     } catch (error) {
       next(error);
