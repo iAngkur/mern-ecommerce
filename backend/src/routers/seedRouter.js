@@ -2,6 +2,6 @@ const { seedUser } = require("../controllers/seedUserController");
 
 const seedRouter = require("express").Router();
 
-seedRouter.get("/users", seedUser);
+seedRouter.post("/users", seedUser);
 
 module.exports = seedRouter;

@@ -13,12 +13,12 @@ const userController = {
         throw createHttpError(400, "Invalid page number");
       }
 
-      const itemsPerpage = Number(req.query.limit) || 5;
-      if (itemsPerpage <= 0) {
+      const itemsPerPage = Number(req.query.limit) || 5;
+      if (itemsPerPage <= 0) {
         throw createHttpError(400, "Invalid number of items per page");
       }
 
-      const itemsSkip = (pageNumber - 1) * itemsPerpage;
+      const itemsSkip = (pageNumber - 1) * itemsPerPage;
 
       const searchRegExp = new RegExp(".*" + search + ".*", "i");
 
@@ -39,14 +39,14 @@ const userController = {
 
       const users = await User.find(filter, options)
         .skip(itemsSkip)
-        .limit(itemsPerpage)
+        .limit(itemsPerPage)
         .sort({ _id: 1 });
 
       if (!users) {
         throw createHttpError(404, "No users found");
       }
 
-      const totalPages = Math.ceil(count / itemsPerpage);
+      const totalPages = Math.ceil(count / itemsPerPage);
 
       return successResponse(res, {
         statusCode: 200,
@@ -70,10 +70,12 @@ const userController = {
       next(error);
     }
   },
+
   getUserById: async (req, res, next) => {
     const userId = req.params.id;
+    const options = { password: 0 };
     try {
-      const user = await findWithId(userId);
+      const user = await findWithId(User, userId, options);
 
       return successResponse(res, {
         statusCode: 200,
@@ -86,10 +88,11 @@ const userController = {
       next(error);
     }
   },
+
   deleteUserById: async (req, res, next) => {
     const userId = req.params.id;
     try {
-      const user = await findWithId(userId);
+      const user = await findWithId(User, userId);
 
       const userImgPath = user.image;
 

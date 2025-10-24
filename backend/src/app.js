@@ -44,7 +44,6 @@ app.use("/api/users", userRouter);
 app.use("/api/seed", seedRouter);
 
 app.use((err, req, res, next) => {
-  console.log("Returing.....");
   return errorResponse(res, { statusCode: err.status, message: err.message });
 });
 
