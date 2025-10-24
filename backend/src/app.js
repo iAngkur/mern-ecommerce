@@ -4,6 +4,8 @@ const morgan = require("morgan");
 const xss = require("xss");
 const rateLimit = require("express-rate-limit");
 const userRouter = require("./routers/userRouter");
+const seedRouter = require("./routers/seedRouter");
+const { errorResponse } = require("./controllers/responseController");
 
 const app = express();
 const rateLimiter = rateLimit({
@@ -38,6 +40,12 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/api/v1/users", userRouter);
+app.use("/api/users", userRouter);
+app.use("/api/seed", seedRouter);
+
+app.use((err, req, res, next) => {
+  console.log("Returing.....");
+  return errorResponse(res, { statusCode: err.status, message: err.message });
+});
 
 module.exports = app;

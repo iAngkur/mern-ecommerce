@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -24,12 +25,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
-      minlength: [6, "Username must be at least  characters long"],
-      set: (val) => bcrypt.hasSync(val, bcrypt.genSaltSync(10)),
+      minlength: [4, "Username must be at least  characters long"],
+      set: (val) => bcrypt.hashSync(val, bcrypt.genSaltSync(10)),
     },
     image: {
       type: String,
-      default: process.env.DEFAULT_USER_IMAGE || 'public/image/users/default-user.png',
+      default: process.env.DEFAULT_USER_IMAGE,
     },
     address: {
       type: String,
