@@ -25,16 +25,17 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
-      minlength: [4, "Username must be at least  characters long"],
+      minlength: [8, "Password must be at least 8 characters long"],
       set: (val) => bcrypt.hashSync(val, bcrypt.genSaltSync(10)),
     },
     image: {
-      type: String,
-      default: process.env.DEFAULT_USER_IMAGE,
+      type: Buffer,
+      contentType: String,
+      required: [true, "User image is required"],
     },
     address: {
       type: String,
-      required: [true, "Password is required"],
+      required: [true, "Address is required"],
     },
     phone: {
       type: String,

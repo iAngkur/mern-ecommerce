@@ -11,6 +11,12 @@ const userController = {
     try {
       const { name, email, password, phone, address, image } = req.body;
 
+      if (!req.file) {
+        throw createHttpError(400, "Image file is required");
+      }
+
+      const imageBufferString = req.file.buffer.toString("base64");
+
       const existing = await User.exists({ email });
 
       if (existing) {
@@ -21,13 +27,13 @@ const userController = {
       }
 
       // create jwt token and send email
-
       const newUser = {
         name,
         email,
         password,
         phone,
         address,
+        image: imageBufferString,
       };
 
       const token = generateToken(
@@ -48,7 +54,7 @@ const userController = {
                <p>${process.env.CLIENT_URL}</p>`,
       };
 
-      // sendEmailWithNodeMail(emailData);
+      sendEmailWithNodeMail(emailData);
 
       return successResponse(res, {
         statusCode: 200,
@@ -180,6 +186,51 @@ const userController = {
         message: "User fetched successfully",
         payload: {
           user,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  updateUserById: async (req, res, next) => {
+    const userId = req.params.id;
+    try {
+      const { name, phone, address } = req.body;
+
+      const updateOptions = {
+        new: true,
+        runValidators: true,
+        context: "query",
+      };
+
+      const updateData = {};
+
+      if (name) updateData.name = name;
+      if (phone) updateData.phone = phone;
+      if (address) updateData.address = address;
+
+      const image = req.file;
+      if (image && image.buffer) {
+        const imageBufferString = req.file.buffer.toString("base64");
+        updateData.image = imageBufferString;
+      }
+
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        updateData,
+        updateOptions
+      );
+
+      if (!updatedUser) {
+        throw createHttpError(404, "User not found");
+      }
+
+      return successResponse(res, {
+        statusCode: 200,
+        message: "User updated successfully",
+        payload: {
+          user: updatedUser,
         },
       });
     } catch (error) {
